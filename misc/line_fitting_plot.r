@@ -16,5 +16,5 @@ log.betaC<-function(x,alpha,beta){
 			(log(x)*(alpha-1))+(log(1-x)*(beta-1))-lbeta(alpha,beta)
 		}
 		
-plot(Xs,exp(log.betaC(Xs,2,5)), type="l", lwd=2)
-plot(Xs,exp(log.betaC(Xs,5,30)), type="l", lwd=2)
+plot(Xs,exp(log.betaC(Xs,4,5)), type="l", lwd=2, ylim=c(0,20))
+points(Xs,exp(log.betaC(Xs,114,18)), type="l", lwd=2, col="red")

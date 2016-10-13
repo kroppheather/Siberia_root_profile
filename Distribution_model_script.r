@@ -7,6 +7,7 @@ setwd("c:\\Users\\hkropp\\Google Drive\\root_analysis")
 #read in data
 datR<-read.csv("fine_root_out.csv")
 #aggregate data for total root biomass across the profile
+#note fixed error in data entry shrub 2 endpoint is 7 not 6
 rootT<-aggregate(datR$bio.mg.cm3, by=list(datR$loc.id, datR$period), FUN="sum")
 colnames(rootT)<-c("loc", "period","root")
 #need a location index for period and loc because is a sparse array
@@ -56,7 +57,8 @@ p.modesd<-aggregate(lp.mode$depM, by=list(lp.mode$Group.2,lp.mode$site), FUN="sd
 p.mode$low<-p.mode$x-p.modesd$x
 p.mode$high<-p.mode$x+p.mode$x
 
-p.mode$high<-ifelse(p.mode$high>1,.999,p.mode$high)
+p.mode$high<-ifelse(p.mode$high>=1,.999,p.mode$high)
+
 #set up datalist for the model
 #data variables:
 #Nobs: number of observations of root biomass
@@ -69,11 +71,30 @@ Rdatalist<-list(Nobs=dim(datR)[1], r.bio=datR$bio.mg.cm3,r.tot=rootT$root,
 				loc.period=datR$loc.period,depth=datR$mid.norm,Nday=4, Day=datR$period, Dlow=p.mode$low, Dhigh=p.mode$high,
 				DaySite=datR$DaySite, Ndaysite=7)
 				
-initslist<-list(list(beta=c(2,2,2,2,2,2,2),Dmode=c(.63,.38,.19,.27,.11,.11,.08), sig.bio=3), 
-				list(beta=c(3,3,3,33,3,3),Dmode=c(.64,.39,.2,.28,.12,.12,.09), sig.bio=1),
-				list(beta=c(2.5,2.5,2.5,2.5,2.5,2.5,2.5),Dmode=c(.60,.35,.16,.26,.10,.10,.05), sig.bio=2))
-				
-				
+initslist<-list(list(
+			Dmode = c(
+			0.8841,0.3599,0.1913,0.1703,0.1152,
+			0.126,0.1314),
+			beta = c(
+			19.4,11.55,17.21,9.314,18.11,
+			8.416,9.866),
+			sig.bio = 1.952),
+			list(
+			Dmode = c(
+			0.6048,0.2461,0.1443,0.1671,0.08721,
+			0.04465,0.1012),
+			beta = c(
+			19.54,19.62,11.37,12.15,19.07,
+			2.275,8.954),
+			sig.bio = 1.876),
+			list(
+			Dmode = c(
+			0.582,0.4269,0.2077,0.117,0.1062,
+			0.1518,0.1205),
+			beta = c(
+			17.84,3.412,15.74,3.571,15.24,
+			6.127,12.76),
+			sig.bio = 1.721))			
 initmodel<-bugs(data=Rdatalist,model.file="c:\\Users\\hkropp\\Documents\\GitHub\\Siberia_root_profile\\Distrubution_model_code.txt",
 				inits=initslist,parameters.to.save=c("alpha","beta","deviance","sig.bio", "mu.bio", "Dmode", "Rbeta"),
 				n.iter=4000,n.chains=3,n.burnin=1000,n.thin=1,

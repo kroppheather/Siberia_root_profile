@@ -7,9 +7,9 @@ Model{
 		r.bio[i]~dnorm(mu.bio[i],tau.bio)
 		#likelihood mean
 		#based on beta shape and total root biomass
-		mu.bio[i]<-r.tot[loc.period[i]]*Rbeta[i]
-		Rbeta[i]<-exp(log.beta[i])
-		log.beta[i]<-(log(depth[i])*(alpha[DaySite[i]]-1))+(log(1-depth[i])*beta[DaySite[i]])
+		mu.bio[i]<-exp((log(depth[i])*(alpha[DaySite[i]]-1))+(log(1-depth[i])*beta[DaySite[i]])
+					-log((exp(loggam(alpha[DaySite[i]]))*exp(loggam(beta[DaySite[i]])))/exp(loggam(alpha[DaySite[i]]+beta[DaySite[i]]))))
+
 
 	}
 	
@@ -21,7 +21,7 @@ Model{
 	for(i in 1:Ndaysite){
 			#start with priors that result in realistic shapes
 			#give beta a noninformative prior
-			beta[i]~dunif(1,20)
+			beta[i]~dunif(1,30)
 			#try to reduce identifiability issues by using the mode
 			#(depth that this highest amount of root biomass occurs at)
 			alpha[i]<-((beta[i]*Dmode[i])-(2*Dmode[i])+1)/(1-Dmode[i])
